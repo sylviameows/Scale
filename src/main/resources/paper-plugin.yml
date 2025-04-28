@@ -1,5 +1,5 @@
 name: Scale
-version: '1.0'
+version: '1.1.0'
 main: net.sylviameows.scale.Core
 description: Scale Plugin
 api-version: '1.21.5'

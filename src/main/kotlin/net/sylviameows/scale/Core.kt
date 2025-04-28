@@ -2,6 +2,7 @@ package net.sylviameows.scale
 
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.minimessage.MiniMessage
+import org.bukkit.Bukkit
 import org.bukkit.NamespacedKey
 import org.bukkit.attribute.Attribute
 import org.bukkit.attribute.AttributeInstance
@@ -26,6 +27,14 @@ class Core : JavaPlugin(), Listener {
         fun parse(text: String): Component {
             return MiniMessage.miniMessage().deserialize(text)
         }
+    }
+
+    override fun onEnable() {
+        Bukkit.getPluginManager().registerEvents(this, this);
+
+        Logger.set(this.componentLogger)
+        this.logger.info("test")
+        this.logger.info(Logger.cache.size.toString())
     }
 
     @EventHandler

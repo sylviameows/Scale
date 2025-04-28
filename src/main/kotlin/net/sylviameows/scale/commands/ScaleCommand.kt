@@ -17,8 +17,8 @@ open class ScaleCommand : Command {
     open val max = 1.11
 
     override fun options(): Options {
-        val player = ArgumentTypes.player()
         val value = DoubleArgumentType.doubleArg(min, max)
+        val player = ArgumentTypes.player()
 
         return super.options()
             .subcommand("reset") {
@@ -29,7 +29,7 @@ open class ScaleCommand : Command {
             }
             .subcommand("set") {
                 it.argument("value", value)
-                it.argument("player", player)
+                it.argument("player", player);
             }
             .argument("value", value)
             .argument("player", player)

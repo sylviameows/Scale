@@ -1,17 +1,17 @@
 package net.sylviameows.scale.commands.api
 
+import net.sylviameows.scale.Logger
 import com.mojang.brigadier.arguments.ArgumentType
 import com.mojang.brigadier.builder.ArgumentBuilder
 import com.mojang.brigadier.builder.LiteralArgumentBuilder
-import com.mojang.brigadier.builder.RequiredArgumentBuilder
 import com.mojang.brigadier.context.CommandContext
+import com.mojang.brigadier.tree.ArgumentCommandNode
 import com.mojang.brigadier.tree.LiteralCommandNode
 import io.papermc.paper.command.brigadier.CommandSourceStack
 import io.papermc.paper.command.brigadier.Commands
-import org.bukkit.permissions.Permission
 
 class Options private constructor(private val name: String, private val callback: (Context) -> Int, private val parent: Options? = null) {
-    private val arguments: MutableMap<String, Argument<out Any>> = HashMap()
+    private val arguments: MutableMap<ArgumentKey, Argument<out Any>> = HashMap()
     private var permission: String? = null;
     private val subcommands: MutableList<Options> = ArrayList()
 
@@ -21,13 +21,15 @@ class Options private constructor(private val name: String, private val callback
         }
     }
 
+    data class ArgumentKey(val name: String, val order: Int)
+
     fun permission(permission: String): Options {
         this.permission = permission;
         return this;
     }
 
     fun argument(name: String, type: Argument<out Any>): Options {
-        arguments[name] = type
+        arguments[ArgumentKey(name, arguments.size)] = type
         return this
     }
 
@@ -44,17 +46,17 @@ class Options private constructor(private val name: String, private val callback
         val context = Context.Builder()
 
         if (!subcommand.isNullOrEmpty()) context.subcommand(subcommand)
+
         for (pair in arguments) {
-            val name = pair.key
+            val key = pair.key
             val argument = pair.value
             try {
-                val value = ctx.getArgument(name, argument.resultType);
-                if (value != null) context.set(name, value)
+                val value = ctx.getArgument(key.name, argument.resultType);
+                if (value != null) context.set(key.name, value)
             } catch (_: IllegalArgumentException) {
 
             }
         }
-
         return context.build(ctx.source);
     }
 
@@ -81,17 +83,22 @@ class Options private constructor(private val name: String, private val callback
 
         literal.executes { callback(getContext(it, subcommand)) }
 
-        var parent: ArgumentBuilder<CommandSourceStack,*> = literal;
-        for (pair in arguments) {
-            val name = pair.key
+        var child: ArgumentBuilder<CommandSourceStack, *>? = null;
+        for (pair in arguments.toSortedMap(compareBy {it.order}).reversed()) {
+            val key = pair.key
             val data = pair.value;
 
-            val argument = Commands.argument(name, data.argumentType)
-            parent.then(argument.executes { callback(getContext(it, subcommand)) })
-
-            parent = argument;
+            val argument = Commands.argument(key.name, data.argumentType)
+                .executes { callback(getContext(it, subcommand)) }
+            if (child != null) {
+                argument.then(child)
+            }
+            child = argument;
         }
-
+        if (child != null) {
+            literal.then(child);
+        }
+        
         for (sub in subcommands) {
             literal.then(sub.convert())
         }
