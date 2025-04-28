@@ -38,8 +38,6 @@ open class ScaleCommand : Command {
     override fun execute(context: Context): Int {
         val sender = context.source.sender;
 
-        sender.sendMessage(context.subcommand ?: "none")
-
         val target: Player
         var other = false;
         if (context.has("player")) {

@@ -4,7 +4,7 @@ plugins {
 }
 
 group = "net.sylviameows"
-version = "1.0-SNAPSHOT"
+version = "1.0.1"
 
 repositories {
     mavenCentral()
@@ -17,7 +17,7 @@ repositories {
 
 dependencies {
     shadow("org.jetbrains.kotlin:kotlin-stdlib:2.1.20")
-    compileOnly("io.papermc.paper:paper-api:1.21.5-R0.1-SNAPSHOT")
+    compileOnly("io.papermc.paper:paper-api:1.21.4-R0.1-SNAPSHOT")
 }
 
 kotlin {
