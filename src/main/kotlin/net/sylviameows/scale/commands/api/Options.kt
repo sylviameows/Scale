@@ -98,7 +98,7 @@ class Options private constructor(private val name: String, private val callback
         if (child != null) {
             literal.then(child);
         }
-        
+
         for (sub in subcommands) {
             literal.then(sub.convert())
         }
