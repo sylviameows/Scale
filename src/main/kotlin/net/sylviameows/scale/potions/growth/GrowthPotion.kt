@@ -7,6 +7,7 @@ import net.sylviameows.scale.potions.PotionManager
 import org.bukkit.Color
 import org.bukkit.Material
 import org.bukkit.NamespacedKey
+import org.bukkit.attribute.Attributable
 import org.bukkit.attribute.Attribute
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
@@ -48,20 +49,16 @@ open class GrowthPotion(override val plugin: Core) : Potion {
         )
     }
 
-    override fun getAttributes(player: Player): List<Potion.AttributeSettings>? {
-        val scaleAttribute = player.getAttribute(Attribute.SCALE) ?: return null;
-        val blockReachAttribute = player.getAttribute(Attribute.BLOCK_INTERACTION_RANGE) ?: return null;
-        val entityReachAttribute = player.getAttribute(Attribute.ENTITY_INTERACTION_RANGE) ?: return null;
-        val jumpHeightAttribute = player.getAttribute(Attribute.JUMP_STRENGTH) ?: return null;
-        val stepHeightAttribute = player.getAttribute(Attribute.STEP_HEIGHT) ?: return null;
-        val fallHeightAttribute = player.getAttribute(Attribute.SAFE_FALL_DISTANCE) ?: return null;
-        return listOf(
-            Potion.AttributeSettings.of(scaleAttribute),
-            Potion.AttributeSettings.of(blockReachAttribute, 0.5),
-            Potion.AttributeSettings.of(entityReachAttribute, 0.5),
-            Potion.AttributeSettings.of(jumpHeightAttribute, 0.5),
-            Potion.AttributeSettings.of(stepHeightAttribute),
-            Potion.AttributeSettings.of(fallHeightAttribute)
-        )
+    override fun getAttributes(attributable: Attributable): List<Potion.AttributeSettings>? {
+        val list = ArrayList<Potion.AttributeSettings?>();
+
+        list.add(Potion.AttributeSettings.of(attributable.getAttribute(Attribute.SCALE)))
+        list.add(Potion.AttributeSettings.of(attributable.getAttribute(Attribute.BLOCK_INTERACTION_RANGE), 0.5))
+        list.add(Potion.AttributeSettings.of(attributable.getAttribute(Attribute.ENTITY_INTERACTION_RANGE), 0.5))
+        list.add(Potion.AttributeSettings.of(attributable.getAttribute(Attribute.JUMP_STRENGTH), 0.5))
+        list.add(Potion.AttributeSettings.of(attributable.getAttribute(Attribute.STEP_HEIGHT)))
+        list.add(Potion.AttributeSettings.of(attributable.getAttribute(Attribute.SAFE_FALL_DISTANCE)))
+
+        return list.filterNotNull()
     }
 }

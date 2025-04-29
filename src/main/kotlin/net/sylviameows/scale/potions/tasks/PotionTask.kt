@@ -3,15 +3,15 @@ package net.sylviameows.scale.potions.tasks
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor
 import net.sylviameows.scale.potions.Potion
-import org.bukkit.entity.Player
+import org.bukkit.entity.Entity
 import org.bukkit.persistence.PersistentDataType
 import org.bukkit.scheduler.BukkitRunnable
 
-class PotionTask(val player: Player, private val attributes: List<Potion.AttributeSettings>, val potion: Potion, val duration: Long) : BukkitRunnable() {
+class PotionTask(val entity: Entity, private val attributes: List<Potion.AttributeSettings>, val potion: Potion, val duration: Long) : BukkitRunnable() {
     var remaining: Long = duration;
 
     init {
-        potion.manager().setActive(player, this);
+        potion.manager().setActive(entity, this);
     }
 
     override fun run() {
@@ -20,19 +20,19 @@ class PotionTask(val player: Player, private val attributes: List<Potion.Attribu
             val component = Component.text("${potion.effectName} (${potion.parseDuration(remaining)})")
                 .color(NamedTextColor.BLUE)
 
-            player.sendActionBar(component)
+            entity.sendActionBar(component)
         }
 
-        player.persistentDataContainer.set(potion.identifier, PersistentDataType.LONG, remaining)
+        entity.persistentDataContainer.set(potion.identifier, PersistentDataType.LONG, remaining)
         if (remaining > 0) return;
 
         end(true)
     }
 
-    fun end(clear: Boolean = true) {
+    fun end(clear: Boolean = true, persist: Boolean = false) {
         if (clear) attributes.forEach { it.instance.removeModifier(potion.identifier) }
-        player.persistentDataContainer.remove(potion.identifier)
-        potion.manager().clearEffect(player)
+        if (!persist) entity.persistentDataContainer.remove(potion.identifier)
+        potion.manager().clearEffect(entity)
         this.cancel()
     }
 }

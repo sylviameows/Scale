@@ -8,12 +8,13 @@ import net.sylviameows.scale.Core
 import net.sylviameows.scale.potions.tasks.PotionTask
 import org.bukkit.Material
 import org.bukkit.NamespacedKey
+import org.bukkit.attribute.Attributable
 import org.bukkit.attribute.AttributeInstance
 import org.bukkit.attribute.AttributeModifier
+import org.bukkit.entity.Entity
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemFlag
 import org.bukkit.inventory.ItemStack
-import org.bukkit.inventory.ShapelessRecipe
 import org.bukkit.persistence.PersistentDataType
 
 interface Potion {
@@ -61,9 +62,14 @@ interface Potion {
     }
 
     fun apply(player: Player, duration: Long = this.duration): PotionTask? {
-        val attributes = getAttributes(player) ?: return null;
+        return applyEntity(player, duration)
+    }
 
-        if (plugin.potionManager.getActive(player)?.potion?.effectName != effectName) {
+    fun applyEntity(entity: Entity, duration: Long = this.duration): PotionTask? {
+        if (entity !is Attributable) return null;
+        val attributes = getAttributes(entity) ?: return null;
+
+        if (plugin.potionManager.getActive(entity)?.potion?.effectName != effectName) {
             attributes.forEach {
                 it.instance.addModifier(
                     AttributeModifier(identifier,
@@ -73,17 +79,18 @@ interface Potion {
             }
         }
 
-        val task = PotionTask(player, attributes, this, duration / 2);
+        val task = PotionTask(entity, attributes, this, duration / 2);
         plugin.potionManager.setActive(task);
 
         return task;
     }
 
-    fun getAttributes(player: Player): List<AttributeSettings>?;
+    fun getAttributes(attributable: Attributable): List<AttributeSettings>?;
     
     data class AttributeSettings(val instance: AttributeInstance, val modifier: Double) {
         companion object {
-            fun of(instance: AttributeInstance, modifier: Double = 1.0): AttributeSettings {
+            fun of(instance: AttributeInstance?, modifier: Double = 1.0): AttributeSettings? {
+                if (instance == null) return null;
                 return AttributeSettings(instance, modifier)
             }
         }

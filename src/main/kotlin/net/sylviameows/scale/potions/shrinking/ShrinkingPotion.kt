@@ -8,6 +8,7 @@ import net.sylviameows.scale.potions.tasks.PotionTask
 import org.bukkit.Color
 import org.bukkit.Material
 import org.bukkit.NamespacedKey
+import org.bukkit.attribute.Attributable
 import org.bukkit.attribute.Attribute
 import org.bukkit.attribute.AttributeModifier
 import org.bukkit.attribute.AttributeModifier.Operation
@@ -51,14 +52,13 @@ open class ShrinkingPotion(override val plugin: Core) : Potion {
         )
     }
 
-    override fun getAttributes(player: Player): List<Potion.AttributeSettings>? {
-        val scaleAttribute = player.getAttribute(Attribute.SCALE) ?: return null;
-        val jumpHeightAttribute = player.getAttribute(Attribute.JUMP_STRENGTH) ?: return null;
-        val stepHeightAttribute = player.getAttribute(Attribute.STEP_HEIGHT) ?: return null;
-        return listOf(
-            Potion.AttributeSettings.of(scaleAttribute),
-            Potion.AttributeSettings.of(jumpHeightAttribute, 0.2),
-            Potion.AttributeSettings.of(stepHeightAttribute)
-        )
+    override fun getAttributes(attributable: Attributable): List<Potion.AttributeSettings>? {
+        val list = ArrayList<Potion.AttributeSettings?>()
+
+        list.add(Potion.AttributeSettings.of(attributable.getAttribute(Attribute.SCALE)))
+        list.add(Potion.AttributeSettings.of(attributable.getAttribute(Attribute.JUMP_STRENGTH), 0.2))
+        list.add(Potion.AttributeSettings.of(attributable.getAttribute(Attribute.STEP_HEIGHT)))
+
+        return list.filterNotNull()
     }
 }
