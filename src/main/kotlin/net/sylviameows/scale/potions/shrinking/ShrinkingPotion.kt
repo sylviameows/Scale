@@ -20,7 +20,14 @@ import org.bukkit.potion.PotionType
 
 open class ShrinkingPotion(override val plugin: Core) : Potion {
     override val name: String = "Shrinking"
-    override val effectName: String = "Shrink I"
+    override val level: Int = 1
+    override val effectName: String
+        get() {
+            var levelString = ""
+            repeat(level) { levelString += "I" }
+            return "Shrink $levelString"
+        }
+
     override val duration: Long = 4 * 60 * 20
     override val identifier: NamespacedKey = NamespacedKey("scale", "lesser_shrinking")
 

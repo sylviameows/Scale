@@ -19,6 +19,7 @@ import org.bukkit.persistence.PersistentDataType
 
 interface Potion {
     val name: String
+    val level: Int
     val effectName: String;
     val duration: Long;
     val modifier: Double;
@@ -26,6 +27,8 @@ interface Potion {
     val plugin: Core
 
     val identifier: NamespacedKey
+
+    fun numerals() {}
 
     fun mix(): PotionMix
 

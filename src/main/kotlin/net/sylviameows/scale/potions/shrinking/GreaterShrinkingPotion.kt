@@ -11,8 +11,7 @@ class GreaterShrinkingPotion(plugin: Core) : ShrinkingPotion(plugin) {
     override val duration: Long
         get() = (super.duration * 0.75).toLong()
 
-    override val effectName: String
-        get() = super.effectName + "I"
+    override val level = 2;
 
     override val modifier: Double = -0.75
 

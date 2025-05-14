@@ -29,10 +29,11 @@ import org.bukkit.plugin.java.JavaPlugin
 
 class Core : JavaPlugin(), Listener {
     val potionManager = PotionManager(this)
-    private val potions = ArrayList<Potion>()
+
 
     companion object {
         val KEY = NamespacedKey.fromString("scale:value")
+        private val potions = ArrayList<Potion>()
 
         fun updateScale(player: Player, scale: Double) {
             player.sendMessage(parse("<white>Your scale has been set to <aqua><u>$scale</u></aqua>!"))
@@ -43,6 +44,14 @@ class Core : JavaPlugin(), Listener {
 
         fun parse(text: String): Component {
             return MiniMessage.miniMessage().deserialize(text)
+        }
+
+        fun potions(): List<Potion> {
+            return potions.toList()
+        }
+
+        fun addPotion(potion: Potion) {
+            potions.add(potion);
         }
     }
 
@@ -58,7 +67,7 @@ class Core : JavaPlugin(), Listener {
     }
 
     private fun registerPotion(potion: Potion) {
-        potions.add(potion);
+        addPotion(potion);
 
         val splashKey = NamespacedKey(potion.identifier.namespace, potion.identifier.key+"_splash")
         server.potionBrewer.addPotionMix(potion.mix())
@@ -107,7 +116,12 @@ class Core : JavaPlugin(), Listener {
             potions.forEach { effect ->
                 val remaining = data.get(effect.identifier, PersistentDataType.LONG)
                 if (remaining != null) {
-                    effect.applyEntity(it, remaining)
+                    try {
+                        effect.applyEntity(it, remaining)
+                    } catch (_: IllegalArgumentException) {
+                        logger.warning("Modifier already applied to entity, skipping!")
+                    }
+
                 }
             }
         }

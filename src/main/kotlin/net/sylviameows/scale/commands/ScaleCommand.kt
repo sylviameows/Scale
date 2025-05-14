@@ -3,10 +3,11 @@ package net.sylviameows.scale.commands
 import com.mojang.brigadier.arguments.DoubleArgumentType
 import io.papermc.paper.command.brigadier.argument.ArgumentTypes
 import io.papermc.paper.command.brigadier.argument.resolvers.selector.PlayerSelectorArgumentResolver
+import net.sylviameows.kitti.api.commands.Command
+import net.sylviameows.kitti.api.commands.Context
+import net.sylviameows.kitti.api.commands.Options
+import net.sylviameows.kitti.api.commands.Result
 import net.sylviameows.scale.Core
-import net.sylviameows.scale.commands.api.Command
-import net.sylviameows.scale.commands.api.Context
-import net.sylviameows.scale.commands.api.Options
 import org.bukkit.entity.Player
 import org.bukkit.persistence.PersistentDataType
 
@@ -16,26 +17,34 @@ open class ScaleCommand : Command {
     open val min = 0.88
     open val max = 1.11
 
-    override fun options(): Options {
+    override fun options(options: Options): Options {
         val value = DoubleArgumentType.doubleArg(min, max)
         val player = ArgumentTypes.player()
 
-        return super.options()
+        return options
             .subcommand("reset") {
-                it.argument("player", player)
+                it.argument("player", player) { arg ->
+                    arg.permission("scale.others")
+                }
             }
             .subcommand("get") {
-                it.argument("player", player)
+                it.argument("player", player) { arg ->
+                    arg.permission("scale.others")
+                }
             }
             .subcommand("set") {
                 it.argument("value", value)
-                it.argument("player", player);
+                it.argument("player", player) { arg ->
+                    arg.permission("scale.others")
+                };
             }
             .argument("value", value)
-            .argument("player", player)
+            .argument("player", player) { arg ->
+                arg.permission("scale.others")
+            }
     }
 
-    override fun execute(context: Context): Int {
+    override fun execute(context: Context): Result {
         val sender = context.source.sender;
 
         val target: Player
@@ -49,12 +58,12 @@ open class ScaleCommand : Command {
 
             if (other && context.subcommand != "get" && !sender.hasPermission("scale.others")) {
                 sender.sendMessage(Core.parse("<red>You do not have permission to set other player's scale!"))
-                return 1;
+                return Result.success();
             }
         } else {
             if (sender !is Player) {
                 sender.sendMessage(Core.parse("<red>You are not a player!"))
-                return 1;
+                return Result.success();
             }
 
             target = sender;
@@ -67,7 +76,7 @@ open class ScaleCommand : Command {
             pdc.set(Core.KEY, PersistentDataType.DOUBLE, 1.0)
             Core.updateScale(target, 1.0)
 
-            return 1;
+            return Result.success();
         }
 
         if (context.has("value")) {
@@ -81,7 +90,7 @@ open class ScaleCommand : Command {
             sender.sendMessage(Core.parse("<white>${ternary(other, "${target.name}'s", "Your")} scale is currently <aqua><u>$scale</u></aqua>."))
         }
 
-        return 1;
+        return Result.success();
     }
 
     private fun ternary(boolean: Boolean, t: String, f: String): String {

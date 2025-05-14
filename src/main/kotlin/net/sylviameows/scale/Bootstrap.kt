@@ -1,20 +1,16 @@
 package net.sylviameows.scale
 
-import io.papermc.paper.plugin.bootstrap.BootstrapContext
-import io.papermc.paper.plugin.bootstrap.PluginBootstrap
 import io.papermc.paper.plugin.bootstrap.PluginProviderContext
-import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents
+import net.sylviameows.kitti.api.KittiBootstrapper
+import net.sylviameows.scale.commands.OverrideScaleCommand
+import net.sylviameows.scale.commands.ScaleCommand
+import net.sylviameows.scale.commands.ScalePotionGiveCommand
 import org.bukkit.plugin.java.JavaPlugin
 
 @Suppress("unused")
-class Bootstrap : PluginBootstrap {
-    override fun bootstrap(context: BootstrapContext) {
-        val manager = context.lifecycleManager
-
-        manager.registerEventHandler(LifecycleEvents.COMMANDS) { commands ->
-            val registrar = commands.registrar();
-            CommandInitializer(registrar);
-        }
+class Bootstrap : KittiBootstrapper() {
+    init {
+        addCommands(ScaleCommand(), OverrideScaleCommand(), ScalePotionGiveCommand())
     }
 
     override fun createPlugin(context: PluginProviderContext): JavaPlugin {

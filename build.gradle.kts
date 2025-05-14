@@ -1,10 +1,9 @@
 plugins {
     kotlin("jvm") version "2.1.20"
-    id("com.github.johnrengelman.shadow") version "8.1.1"
 }
 
 group = "net.sylviameows"
-version = "2.1.0"
+version = "3.0.0"
 
 repositories {
     mavenCentral()
@@ -13,11 +12,16 @@ repositories {
         name = "papermc"
         url = uri("https://repo.papermc.io/repository/maven-public/")
     }
+
+    maven {
+        name = "sylviameows"
+        url = uri("https://repo.sylviameo.ws/releases/")
+    }
 }
 
 dependencies {
-    shadow("org.jetbrains.kotlin:kotlin-stdlib:2.1.20")
     compileOnly("io.papermc.paper:paper-api:1.21.4-R0.1-SNAPSHOT")
+    implementation("net.sylviameows:kitti:0.2.0")
 }
 
 kotlin {
