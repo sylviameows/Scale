@@ -21,7 +21,7 @@ repositories {
 
 dependencies {
     compileOnly("io.papermc.paper:paper-api:1.21.4-R0.1-SNAPSHOT")
-    implementation("net.sylviameows:kitti:0.2.0")
+    compileOnly("net.sylviameows:kitti:0.3.0")
 }
 
 kotlin {
