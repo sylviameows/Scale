@@ -1,5 +1,9 @@
 **[Scale]**
 Allow players to set their scale attribute easily.
+
+> [!WARNING]
+> This project now requires **KittiLib** (https://github.com/sylviameows/Kitti/), make sure to install the Core jar and place it in your server directory before updating beyond `3.0.0`!
+
 ***
 **[Shrinking Potions]**
 - Tier I: Shrinks the player 50%
